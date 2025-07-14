@@ -1,0 +1,19 @@
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore pytest cache
+.pytest_cache/
+
+# Ignore virtual environments
+.venv/
+env/
+venv/
+
+# Ignore model checkpoints or large files
+*.keras
+*.h5
+*.pkl
+*.log
+.DS_Store
+
