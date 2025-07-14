@@ -1,3 +1,6 @@
 [
-  "tests/test_recommendation.py::test_recommendation_endpoint_success"
+  "tests/test_recommendation.py::test_recommendation_endpoint_success",
+  "tests/test_recommendation.py::test_recommendation_invalid_mood",
+  "tests/test_recommendation.py::test_recommendation_no_results",
+  "tests/test_recommendation.py::test_recommendation_success"
 ]

@@ -1,4 +1,3 @@
 {
-  "tests/test_reccomendations.py": true,
-  "tests/test_recommendation.py::TestClient": true
+  "tests/test_reccomendations.py": true
 }

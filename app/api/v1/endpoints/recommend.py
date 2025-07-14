@@ -1,11 +1,12 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
-from app.models.predict import recommend_products
+from app.services.pipeline import run_recommendation_pipeline
 
-router = APIRouter()
+router = APIRouter(prefix='/recommendation', tags=["recommendation"])
 
-# ✅ بيانات المنتج في الريسبونس
+
+# ✅ شكل المنتج في الريسبونس
 class ProductDetail(BaseModel):
     product_id: str
     product_type: str
@@ -15,9 +16,6 @@ class ProductDetail(BaseModel):
     interaction: Optional[str]
     timestamp: Optional[str]
 
-# ✅ الريسبونس الكامل
-class RecommendResponse(BaseModel):
-    recommended_products: List[ProductDetail]
 
 # ✅ الريكوست
 class RecommendRequest(BaseModel):
@@ -25,16 +23,29 @@ class RecommendRequest(BaseModel):
     occasion: str
     preferred_categories: List[str]
 
-# ✅ API endpoint
+
+# ✅ الريسبونس
+class RecommendResponse(BaseModel):
+    recommended_products: List[ProductDetail]
+
+
+# ✅ Endpoint
 @router.post("/recommend", response_model=RecommendResponse)
 def recommend_endpoint(request: RecommendRequest):
     try:
-        recommendations = recommend_products(
+        results = run_recommendation_pipeline(
             mood=request.mood,
             occasion=request.occasion,
             preferred_categories=request.preferred_categories
         )
-        return RecommendResponse(recommended_products=recommendations)
+
+        # ❌ لا ترمي Error لو مفيش نتائج
+        return RecommendResponse(recommended_products=results)
+
+    except ValueError as ve:
+        # ⛔️ هندل الأخطاء المعروفة مثل invalid mood/category
+        raise HTTPException(status_code=400, detail=str(ve))
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Recommendation error: {str(e)}")
+

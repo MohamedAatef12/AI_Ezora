@@ -1,0 +1,25 @@
+data:
+  raw_data_path: data/female_fashion_interactions.csv
+  processed_data_path: data/processed_data.csv
+
+model:
+  save_path: app/saved_models/models/model.keras
+  embedding_dim: 16
+  epochs: 5
+  batch_size: 64
+  top_k: 5
+
+encoders:
+  path: app/saved_models/encoders/encoders
+
+nlp:
+  model_path: app/models/nlp/model.pkl
+
+logging:
+  log_path: logs/logger.py
+  log_level: INFO
+
+fastapi:
+  host: 0.0.0.0
+  port: 8000
+  reload: true

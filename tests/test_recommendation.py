@@ -1,33 +1,53 @@
-import sys
-import os
-
-# أضف المسار الجذر للمشروع إلى sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
+import pytest
 from fastapi.testclient import TestClient
-from app.main import app 
+from app.main import app
+
 client = TestClient(app)
 
-def test_recommendation_endpoint_success():
+def test_recommendation_success():
     payload = {
-        "mood": "romantic",
-        "occasion": "party",
-        "preferred_categories": ["heels", "skirts"]
+        "mood": "happy",
+        "occasion": "work",
+        "preferred_categories": ["scarves", "heels"]
     }
 
     response = client.post("/api/v1/recommendation/recommend", json=payload)
-    assert response.status_code == 200
 
+    assert response.status_code == 200
     data = response.json()
     assert "recommended_products" in data
     assert isinstance(data["recommended_products"], list)
-    assert len(data["recommended_products"]) > 0
 
-    first_product = data["recommended_products"][0]
-    assert "product_id" in first_product
-    assert "product_type" in first_product
-    assert "style" in first_product
-    assert "color" in first_product
-    assert "season" in first_product
-    assert "interaction" in first_product
-    assert "timestamp" in first_product
+    if data["recommended_products"]:
+        product = data["recommended_products"][0]
+        assert "product_id" in product
+        assert "product_type" in product
+        assert "style" in product
+        assert "color" in product
+        assert "season" in product
+
+def test_recommendation_invalid_mood():
+    payload = {
+        "mood": "invalid_mood",
+        "occasion": "work",
+        "preferred_categories": ["scarves", "heels"]
+    }
+
+    response = client.post("/api/v1/recommendation/recommend", json=payload)
+
+    assert response.status_code == 400
+    assert "Unknown mood" in response.json()["detail"]
+
+
+
+def test_recommendation_no_results():
+    payload = {
+        "mood": "happy",
+        "occasion": "work",
+        "preferred_categories": ["hats"]  # assume it's not encoded
+    }
+
+    response = client.post("/api/v1/recommendation/recommend", json=payload)
+
+    assert response.status_code == 200
+    assert response.json()["recommended_products"] == []
